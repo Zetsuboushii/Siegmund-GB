@@ -11,7 +11,7 @@
 
 IMPORT_MAP(map);
 
-const UINT8 collision_tiles[] = {1, 2, 3, 0};
+const UINT8 collision_tiles[] = {1, 2, 3, 4, 5, 6, 7, 0};
 
 UINT16 reset_x;
 UINT16 reset_y;
