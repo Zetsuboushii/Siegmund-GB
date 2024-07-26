@@ -8,7 +8,7 @@
 #include "SpriteManager.h"
 #include "asm/sm83/types.h"
 
-const UINT8 anim_walk[] = {6, 0, 2, 0, 3, 0, 4};
+const UINT8 anim_walk[] = {2, 2, 1};
 const UINT8 anim_idle[] = {2, 0, 1};
 
 typedef enum {
