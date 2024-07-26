@@ -10,16 +10,21 @@
 
 const UINT8 anim_walk[] = {2, 2, 1};
 const UINT8 anim_idle[] = {2, 0, 1};
+const UINT8 anim_atck[] = {4, 3, 3, 3, 3};
+const UINT8 anim_slsh[] = {4, 4, 5, 6, 7};
 
 typedef enum {
     PLAYER_STATE_NORMAL,
     PLAYER_STATE_JUMPING,
-    PLAYER_STATE_RUNNING
+    PLAYER_STATE_RUNNING,
+    PLAYER_STATE_ATTACKING
 } PLAYER_STATE;
 
 PLAYER_STATE player_state;
 INT16 player_accel_y;
 INT8 player_accel_x;
+
+Sprite *attack_sprite;
 
 extern UINT16 reset_x;
 extern UINT16 reset_y;
@@ -34,6 +39,8 @@ void START() {
     scroll_target = THIS;
 
     player_state = PLAYER_STATE_NORMAL;
+
+    attack_sprite = 0;
 }
 
 UINT8 tile_collision;
@@ -64,6 +71,16 @@ void MovePlayer(Sprite *sprite, UINT8 idx) {
     }
 }
 
+void UpdateAttackPosition() {
+    SetSpriteAnim(attack_sprite, anim_slsh, 3u);
+    attack_sprite->mirror = THIS->mirror;
+    if (THIS->mirror == V_MIRROR)
+        attack_sprite->x = THIS->x - 16u;
+    else
+        attack_sprite->x = THIS->x + 16u;
+    attack_sprite->y = THIS->y;
+}
+
 void UPDATE() {
     UINT8 i;
     Sprite *sprite;
@@ -82,7 +99,6 @@ void UPDATE() {
                 player_accel_y = -50;
                 player_state = PLAYER_STATE_JUMPING;
             }
-
 
 
             if (KEY_PRESSED(J_B)) {
@@ -121,6 +137,16 @@ void UPDATE() {
                 player_state = PLAYER_STATE_JUMPING;
             }
             break;
+
+        case PLAYER_STATE_ATTACKING:
+            if (THIS->anim_frame == 1) {
+                player_state = PLAYER_STATE_NORMAL;
+                SpriteManagerRemoveSprite(attack_sprite);
+            } else {
+                MovePlayer(THIS, THIS_IDX);
+                UpdateAttackPosition();
+            }
+            break;
     }
 
     if (player_accel_y < 40) {
@@ -142,6 +168,15 @@ void UPDATE() {
         }
 
         CheckCollisionTile(THIS, THIS_IDX);
+    }
+
+    // TODO: Fix Slashing Animation
+    if (KEY_TICKED(J_B) && player_state != PLAYER_STATE_ATTACKING) {
+        //SetSpriteAnim(THIS, anim_atck, 3u);
+        player_state = PLAYER_STATE_ATTACKING;
+
+        attack_sprite = SpriteManagerAdd(SpriteAttack, THIS->x, THIS->y);
+        UpdateAttackPosition();
     }
 }
 

@@ -1,6 +1,5 @@
 #include "ZGBMain.h"
 #include "Math.h"
-#include <stdint.h>
 #include "asm/sm83/types.h"
 
 UINT8 next_state = StateGame;

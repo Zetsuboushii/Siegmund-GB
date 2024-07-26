@@ -5,7 +5,6 @@
 #include "SpriteManager.h"
 #include "ZGBMain.h"
 #include "Music.h"
-#include "Palette.h"
 #include "asm/sm83/types.h"
 
 
