@@ -50,6 +50,8 @@ void CheckCollisionTile(Sprite *sprite, UINT8 idx) {
     }
 }
 
+// TODO: Implement Dash Ability
+
 void MovePlayer(Sprite *sprite, UINT8 idx) {
     if (KEY_PRESSED(J_RIGHT)) {
         tile_collision = TranslateSprite(sprite, (1 << delta_time) * player_accel_x, 0);
@@ -80,6 +82,8 @@ void UPDATE() {
                 player_accel_y = -50;
                 player_state = PLAYER_STATE_JUMPING;
             }
+
+
 
             if (KEY_PRESSED(J_B)) {
                 player_accel_x = 2;
