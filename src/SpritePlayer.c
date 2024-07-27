@@ -11,20 +11,20 @@
 const UINT8 anim_walk[] = {2, 2, 1};
 const UINT8 anim_idle[] = {2, 0, 1};
 const UINT8 anim_duck[] = {1, 1};
-const UINT8 anim_atck[] = {4, 3, 3, 3, 3};
+const UINT8 anim_atck[] = {4, 2, 2, 2, 2};
 const UINT8 anim_slsh[] = {4, 4, 5, 6, 7};
 
 typedef enum {
     PLAYER_STATE_NORMAL,
     PLAYER_STATE_JUMPING,
     PLAYER_STATE_RUNNING,
-    PLAYER_STATE_ATTACKING,
-    PLAYER_STATE_DASHING
+    PLAYER_STATE_ATTACKING
 } PLAYER_STATE;
 
 PLAYER_STATE player_state;
 INT16 player_accel_y;
 INT8 player_accel_x;
+INT8 jump_counter = 2;
 
 Sprite *slashing_sprite;
 
@@ -59,8 +59,6 @@ void CheckCollisionTile(Sprite *sprite, UINT8 idx) {
     }
 }
 
-// TODO: Implement Dash Ability
-
 void MovePlayer(Sprite *sprite, UINT8 idx) {
     if (KEY_PRESSED(J_RIGHT)) {
         tile_collision = TranslateSprite(sprite, (1 << delta_time) * player_accel_x, 0);
@@ -89,6 +87,7 @@ void UPDATE() {
 
     switch (player_state) {
         case PLAYER_STATE_NORMAL:
+            jump_counter = 2;
             MovePlayer(THIS, THIS_IDX);
 
             if (KEY_PRESSED(J_RIGHT) || KEY_PRESSED(J_LEFT)) {
@@ -98,6 +97,7 @@ void UPDATE() {
             }
 
             if (KEY_TICKED(J_A)) {
+                jump_counter -= 1;
                 player_accel_y = -50;
                 player_state = PLAYER_STATE_JUMPING;
             }
@@ -106,10 +106,10 @@ void UPDATE() {
                 SetSpriteAnim(THIS, anim_duck, 15u);
             }
 
-            if (KEY_PRESSED(J_B)) {
-                player_accel_x = 2;
-                player_state = PLAYER_STATE_RUNNING;
-            }
+            // if (KEY_PRESSED(J_B)) {
+            //     player_accel_x = 2;
+            //     player_state = PLAYER_STATE_RUNNING;
+            // }
 
             if ((player_accel_y >> 4) > 1) {
                 player_state = PLAYER_STATE_JUMPING;
@@ -119,10 +119,24 @@ void UPDATE() {
         case PLAYER_STATE_JUMPING:
             MovePlayer(THIS, THIS_IDX);
 
+            if (KEY_TICKED(J_A) && jump_counter > 0) {
+                jump_counter -= 2;
+                player_accel_y = -50;
+                player_state = PLAYER_STATE_JUMPING;
+            }
+
             if (KEY_RELEASED(J_B)) {
                 player_accel_x = 1;
                 player_state = PLAYER_STATE_JUMPING;
             }
+
+            if (slashing_sprite->anim_frame == 3) {
+                player_accel_x = 1;
+                SpriteManagerRemoveSprite(slashing_sprite);
+            } else {
+                UpdateAttackPosition();
+            }
+
             break;
 
         case PLAYER_STATE_RUNNING:
@@ -144,7 +158,14 @@ void UPDATE() {
             break;
 
         case PLAYER_STATE_ATTACKING:
+            if (KEY_TICKED(J_A)) {
+                jump_counter -= 1;
+                player_accel_y = -50;
+                player_state = PLAYER_STATE_JUMPING;
+            }
+
             if (slashing_sprite->anim_frame == 3) {
+                player_accel_x = 1;
                 player_state = PLAYER_STATE_NORMAL;
                 SpriteManagerRemoveSprite(slashing_sprite);
             } else {
@@ -176,6 +197,7 @@ void UPDATE() {
     }
 
     if (KEY_TICKED(J_B) && player_state != PLAYER_STATE_ATTACKING) {
+        player_accel_x = 5;
         SetSpriteAnim(THIS, anim_atck, 3u);
         player_state = PLAYER_STATE_ATTACKING;
 
