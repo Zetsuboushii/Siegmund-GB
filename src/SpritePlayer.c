@@ -24,7 +24,7 @@ PLAYER_STATE player_state;
 INT16 player_accel_y;
 INT8 player_accel_x;
 
-Sprite *attack_sprite;
+Sprite *slashing_sprite;
 
 extern UINT16 reset_x;
 extern UINT16 reset_y;
@@ -40,7 +40,7 @@ void START() {
 
     player_state = PLAYER_STATE_NORMAL;
 
-    attack_sprite = 0;
+    slashing_sprite = 0;
 }
 
 UINT8 tile_collision;
@@ -72,13 +72,13 @@ void MovePlayer(Sprite *sprite, UINT8 idx) {
 }
 
 void UpdateAttackPosition() {
-    SetSpriteAnim(attack_sprite, anim_slsh, 3u);
-    attack_sprite->mirror = THIS->mirror;
+    SetSpriteAnim(slashing_sprite, anim_slsh, 15u);
+    slashing_sprite->mirror = THIS->mirror;
     if (THIS->mirror == V_MIRROR)
-        attack_sprite->x = THIS->x - 16u;
+        slashing_sprite->x = THIS->x - 16u;
     else
-        attack_sprite->x = THIS->x + 16u;
-    attack_sprite->y = THIS->y;
+        slashing_sprite->x = THIS->x + 16u;
+    slashing_sprite->y = THIS->y;
 }
 
 void UPDATE() {
@@ -139,9 +139,9 @@ void UPDATE() {
             break;
 
         case PLAYER_STATE_ATTACKING:
-            if (THIS->anim_frame == 1) {
+            if (slashing_sprite->anim_frame == 3) {
                 player_state = PLAYER_STATE_NORMAL;
-                SpriteManagerRemoveSprite(attack_sprite);
+                SpriteManagerRemoveSprite(slashing_sprite);
             } else {
                 MovePlayer(THIS, THIS_IDX);
                 UpdateAttackPosition();
@@ -172,10 +172,10 @@ void UPDATE() {
 
     // TODO: Fix Slashing Animation
     if (KEY_TICKED(J_B) && player_state != PLAYER_STATE_ATTACKING) {
-        //SetSpriteAnim(THIS, anim_atck, 3u);
+        SetSpriteAnim(THIS, anim_atck, 3u);
         player_state = PLAYER_STATE_ATTACKING;
 
-        attack_sprite = SpriteManagerAdd(SpriteAttack, THIS->x, THIS->y);
+        slashing_sprite = SpriteManagerAdd(SpriteAttack, THIS->x, THIS->y);
         UpdateAttackPosition();
     }
 }
