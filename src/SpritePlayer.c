@@ -158,7 +158,7 @@ void UPDATE() {
             break;
 
         case PLAYER_STATE_ATTACKING:
-            if (KEY_TICKED(J_A)) {
+            if (KEY_TICKED(J_A) && jump_counter > 0) {
                 jump_counter -= 1;
                 player_accel_y = -50;
                 player_state = PLAYER_STATE_JUMPING;
