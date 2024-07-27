@@ -10,6 +10,7 @@
 
 const UINT8 anim_walk[] = {2, 2, 1};
 const UINT8 anim_idle[] = {2, 0, 1};
+const UINT8 anim_duck[] = {1, 1};
 const UINT8 anim_atck[] = {4, 3, 3, 3, 3};
 const UINT8 anim_slsh[] = {4, 4, 5, 6, 7};
 
@@ -17,7 +18,8 @@ typedef enum {
     PLAYER_STATE_NORMAL,
     PLAYER_STATE_JUMPING,
     PLAYER_STATE_RUNNING,
-    PLAYER_STATE_ATTACKING
+    PLAYER_STATE_ATTACKING,
+    PLAYER_STATE_DASHING
 } PLAYER_STATE;
 
 PLAYER_STATE player_state;
@@ -100,6 +102,9 @@ void UPDATE() {
                 player_state = PLAYER_STATE_JUMPING;
             }
 
+            if (KEY_PRESSED(J_DOWN)) {
+                SetSpriteAnim(THIS, anim_duck, 15u);
+            }
 
             if (KEY_PRESSED(J_B)) {
                 player_accel_x = 2;
@@ -170,7 +175,6 @@ void UPDATE() {
         CheckCollisionTile(THIS, THIS_IDX);
     }
 
-    // TODO: Fix Slashing Animation
     if (KEY_TICKED(J_B) && player_state != PLAYER_STATE_ATTACKING) {
         SetSpriteAnim(THIS, anim_atck, 3u);
         player_state = PLAYER_STATE_ATTACKING;
