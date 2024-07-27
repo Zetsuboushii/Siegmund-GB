@@ -13,7 +13,8 @@ add_library(common STATIC ${PROJECT_SOURCE_DIR}/common/src/ZGBMain_Init.c
         src/StateGame.c
         src/ZGBMain.c
         src/SpritePlayer.c
-        src/SpriteAttack.c)
+        src/SpriteAttack.c
+        src/SpriteSkeleton.c)
 
 add_executable(siegmund_gb src/ZGBMain.c)
 target_link_libraries(siegmund_gb common)

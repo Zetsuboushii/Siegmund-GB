@@ -87,7 +87,6 @@ void UPDATE() {
 
     switch (player_state) {
         case PLAYER_STATE_NORMAL:
-            jump_counter = 2;
             MovePlayer(THIS, THIS_IDX);
 
             if (KEY_PRESSED(J_RIGHT) || KEY_PRESSED(J_LEFT)) {
@@ -96,7 +95,7 @@ void UPDATE() {
                 SetSpriteAnim(THIS, anim_idle, 3u);
             }
 
-            if (KEY_TICKED(J_A)) {
+            if (KEY_TICKED(J_A) && jump_counter > 0) {
                 jump_counter -= 1;
                 player_accel_y = -50;
                 player_state = PLAYER_STATE_JUMPING;
@@ -182,6 +181,7 @@ void UPDATE() {
     if (!tile_collision && delta_time != 0 && player_accel_y < 40) {
         player_accel_y = 0;
         if (player_state == PLAYER_STATE_JUMPING) {
+            jump_counter = 2;
             player_state = PLAYER_STATE_NORMAL;
         }
 
@@ -190,6 +190,7 @@ void UPDATE() {
     if (tile_collision) {
         player_accel_y = 0;
         if (player_state == PLAYER_STATE_JUMPING) {
+            jump_counter = 2;
             player_state = PLAYER_STATE_NORMAL;
         }
 
@@ -203,6 +204,14 @@ void UPDATE() {
 
         slashing_sprite = SpriteManagerAdd(SpriteAttack, THIS->x, THIS->y);
         UpdateAttackPosition();
+    }
+
+    SPRITEMANAGER_ITERATE(i, sprite) {
+        if (sprite->type == SpriteSkeleton) {
+            if (CheckCollision(THIS, sprite)) {
+                SetState(StateGame);
+            }
+        }
     }
 }
 
